@@ -1,9 +1,12 @@
+import Layout from './Layouts/Layout'
 import Routes from './Routes'
 
 function App () {
   return (
     <>
-      <Routes></Routes>
+      <Layout>
+        <Routes />
+      </Layout>
     </>
   )
 }
