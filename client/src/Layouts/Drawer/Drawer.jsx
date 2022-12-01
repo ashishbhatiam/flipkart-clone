@@ -52,7 +52,6 @@ const Drawer = props => {
   const navigate = useNavigate()
 
   const isPathMatch = key => {
-    console.log('matchPath(key, pathname): ', matchPath(key, pathname))
     return matchPath(key, pathname) ? true : false
   }
 
