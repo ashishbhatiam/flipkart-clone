@@ -3,6 +3,7 @@ const createTokenUser = require('./createTokenUser')
 const createUserData = require('./createUserData')
 const { user_role, admin_role } = require('./constants')
 const checkPermission = require('./checkPermission')
+const createSlugify = require('./createSlugify')
 
 module.exports = {
   createJWTtoken,
@@ -11,5 +12,6 @@ module.exports = {
   createUserData,
   user_role,
   admin_role,
-  checkPermission
+  checkPermission,
+  createSlugify
 }
