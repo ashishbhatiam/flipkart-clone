@@ -15,8 +15,8 @@ const authRouter = require('./routes/authRoutes')
 const userRouter = require('./routes/userRoutes')
 
 // Admin Router
-const authAdminRouter = require('./routes/admin/authRoutes')
-const userAdminRouter = require('./routes/admin/userRoutes')
+const authAdminRouter = require('./routes/admin/authAdminRoutes')
+const userAdminRouter = require('./routes/admin/userAdminRoutes')
 const errorHandlerMiddleware = require('./middleware/error-handler')
 const NotFoundMiddleware = require('./middleware/not-found')
 
