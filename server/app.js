@@ -13,10 +13,9 @@ const cors = require('cors')
 // Router
 const authRouter = require('./routes/authRoutes')
 const userRouter = require('./routes/userRoutes')
+const categoryRouter = require('./routes/categoryRoutes')
 
 // Admin Router
-const authAdminRouter = require('./routes/admin/authAdminRoutes')
-const userAdminRouter = require('./routes/admin/userAdminRoutes')
 const errorHandlerMiddleware = require('./middleware/error-handler')
 const NotFoundMiddleware = require('./middleware/not-found')
 
@@ -29,10 +28,7 @@ app.use(cors())
 // Routes
 app.use('/api/v1/auth', authRouter)
 app.use('/api/v1/user', userRouter)
-
-//Admin Routes
-app.use('/api/v1/admin/auth', authAdminRouter)
-app.use('/api/v1/admin/user', userAdminRouter)
+app.use('/api/v1/category', categoryRouter)
 
 app.use(NotFoundMiddleware)
 app.use(errorHandlerMiddleware)

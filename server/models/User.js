@@ -5,13 +5,13 @@ const UserSchema = mongoose.Schema(
   {
     firstName: {
       type: String,
-      required: [true, 'first name is required'],
+      required: [true, 'Please provide first name'],
       trim: true,
       maxLength: 20
     },
     lastName: {
       type: String,
-      required: [true, 'last name is required'],
+      required: [true, 'Please provide last name'],
       trim: true,
       maxLength: 20
     },
@@ -20,21 +20,21 @@ const UserSchema = mongoose.Schema(
     },
     userName: {
       type: String,
-      required: [true, 'username is required'],
+      required: [true, 'Please provide username'],
       trim: true,
       unique: true,
       lowercase: true
     },
     email: {
       type: String,
-      required: [true, 'email is required'],
+      required: [true, 'Please provide email'],
       trim: true,
       unique: true,
       lowercase: true
     },
     password: {
       type: String,
-      required: [true, 'password is required']
+      required: [true, 'Please provide password']
     },
     role: {
       type: String,
