@@ -20,11 +20,36 @@ const createCategory = async (req, res) => {
   res.status(StatusCodes.CREATED).json(category)
 }
 
+const nestedCategories = (categories, parentId = null) => {
+  let categoryList = []
+  let category
+
+  if (parentId) {
+    category = categories.filter(cat => String(cat.parent) === String(parentId))
+    console.log('category: ', category)
+  } else {
+    category = categories.filter(cat => !cat.parent)
+  }
+
+  for (const cate of category) {
+    categoryList.push({
+      _id: cate._id,
+      name: cate.name,
+      slug: cate.slug,
+      children: nestedCategories(categories, cate._id)
+    })
+  }
+
+  return categoryList
+}
+
 const getAllCategories = async (req, res) => {
-  const categories = await Category.find({}).populate
-  res
-    .status(StatusCodes.OK)
-    .json({ count: categories.length, category: categories })
+  const category = await Category.find({})
+  const nestedCategoriesList = nestedCategories(category)
+  res.status(StatusCodes.OK).json({
+    count: nestedCategoriesList.length,
+    category: nestedCategoriesList
+  })
 }
 
 const getSingleCategory = async (req, res) => {
