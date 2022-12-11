@@ -36,6 +36,8 @@ const nestedCategories = (categories, parentId = null) => {
       _id: cate._id,
       name: cate.name,
       slug: cate.slug,
+      createdAt: cate.createdAt,
+      updatedAt: cate.updatedAt,
       children: nestedCategories(categories, cate._id)
     })
   }

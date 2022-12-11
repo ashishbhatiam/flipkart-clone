@@ -72,7 +72,8 @@ const createProduct = async (req, res) => {
 }
 
 const getAllProduct = async (req, res) => {
-  res.send('Get All Products')
+  const products = await Product.find({}).sort('createdAt').populate('category')
+  res.status(StatusCodes.OK).json({ count: products.length, product: products })
 }
 
 const getSingleProduct = async (req, res) => {
