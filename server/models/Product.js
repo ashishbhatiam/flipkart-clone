@@ -12,6 +12,14 @@ const SingleProductImageSchema = mongoose.Schema({
   }
 })
 
+const imageLength = val => {
+  return val.length
+}
+
+const imageLimit = val => {
+  return val.length <= 10
+}
+
 const ProductSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -42,7 +50,19 @@ const ProductSchema = new mongoose.Schema({
     ref: 'User',
     required: true
   },
-  productImages: [SingleProductImageSchema],
+  productImages: {
+    type: [SingleProductImageSchema],
+    validate: [
+      {
+        validator: imageLength,
+        message: 'Please provide atleast one product image.'
+      },
+      {
+        validator: imageLimit,
+        message: 'maximun 10 product images are allowed.'
+      }
+    ]
+  },
   inventory: {
     type: Number,
     default: 0
