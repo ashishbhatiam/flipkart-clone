@@ -46,11 +46,191 @@ const nestedCategories = (categories, parentId = null) => {
 }
 
 const getAllCategories = async (req, res) => {
-  const category = await Category.find({})
-  const nestedCategoriesList = nestedCategories(category)
+  // Custom Recursive solution
+
+  // const category = await Category.find({}).populate({
+  //   path: 'children',
+  //   populate: { path: 'children' }
+  // })
+
+  // const nestedCategoriesList = nestedCategories(category)
+  // res.status(StatusCodes.OK).json({
+  //   count: nestedCategoriesList.length,
+  //   category: nestedCategoriesList
+  // })
+
+  /* ---------------------------------------------------- */
+
+  // Single Lookup pipeline
+  // const category = await Category.aggregate([
+  //   // Match All
+  //   {
+  //     $match: {}
+  //   },
+  //   // Single Lookup pipeline
+  //   {
+  //     $lookup: {
+  //       from: 'categories',
+  //       let: {
+  //         category_id: '$_id'
+  //       },
+  //       pipeline: [
+  //         {
+  //           $match: {
+  //             $expr: {
+  //               $and: [{ $eq: ['$parent', '$$category_id'] }]
+  //             }
+  //           }
+  //         }
+  //       ],
+  //       as: 'children'
+  //     }
+  //   },
+  //   // Query Record with No Parent
+  //   {
+  //     $match: {
+  //       parent: null
+  //     }
+  //   }
+  // ])
+
+  /* ---------------------------------------------------- */
+
+  // Nested [6 LEVEL] Lookup Pipeline
+  const category = await Category.aggregate([
+    // Match All
+    {
+      $match: {}
+    },
+    // Nested Lookup Pipeline
+    {
+      $lookup: {
+        from: 'categories',
+        let: {
+          category_id: '$_id'
+        },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $and: [{ $eq: ['$parent', '$$category_id'] }]
+              }
+            }
+          },
+          {
+            $lookup: {
+              from: 'categories',
+              let: {
+                category_id: '$_id'
+              },
+              pipeline: [
+                {
+                  $match: {
+                    $expr: {
+                      $and: [{ $eq: ['$parent', '$$category_id'] }]
+                    }
+                  }
+                },
+                {
+                  $lookup: {
+                    from: 'categories',
+                    let: {
+                      category_id: '$_id'
+                    },
+                    pipeline: [
+                      {
+                        $match: {
+                          $expr: {
+                            $and: [{ $eq: ['$parent', '$$category_id'] }]
+                          }
+                        }
+                      },
+                      {
+                        $lookup: {
+                          from: 'categories',
+                          let: {
+                            category_id: '$_id'
+                          },
+                          pipeline: [
+                            {
+                              $match: {
+                                $expr: {
+                                  $and: [{ $eq: ['$parent', '$$category_id'] }]
+                                }
+                              }
+                            },
+                            {
+                              $lookup: {
+                                from: 'categories',
+                                let: {
+                                  category_id: '$_id'
+                                },
+                                pipeline: [
+                                  {
+                                    $match: {
+                                      $expr: {
+                                        $and: [
+                                          { $eq: ['$parent', '$$category_id'] }
+                                        ]
+                                      }
+                                    }
+                                  },
+                                  {
+                                    $lookup: {
+                                      from: 'categories',
+                                      let: {
+                                        category_id: '$_id'
+                                      },
+                                      pipeline: [
+                                        {
+                                          $match: {
+                                            $expr: {
+                                              $and: [
+                                                {
+                                                  $eq: [
+                                                    '$parent',
+                                                    '$$category_id'
+                                                  ]
+                                                }
+                                              ]
+                                            }
+                                          }
+                                        }
+                                      ],
+                                      as: 'children'
+                                    }
+                                  }
+                                ],
+                                as: 'children'
+                              }
+                            }
+                          ],
+                          as: 'children'
+                        }
+                      }
+                    ],
+                    as: 'children'
+                  }
+                }
+              ],
+              as: 'children'
+            }
+          }
+        ],
+        as: 'children'
+      }
+    },
+    // Query Record with No Parent
+    {
+      $match: {
+        parent: null
+      }
+    }
+  ])
+
   res.status(StatusCodes.OK).json({
-    count: nestedCategoriesList.length,
-    category: nestedCategoriesList
+    count: category.length,
+    category: category
   })
 }
 
