@@ -7,7 +7,7 @@ const {
   getSingleCategory,
   updateCategory,
   deleteCategory
-} = require('../controllers/CategoryController')
+} = require('../controllers/categoryController')
 const {
   authenticationMiddleware,
   authorizePermissonsMiddleware

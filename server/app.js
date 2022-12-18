@@ -11,8 +11,8 @@ const morgan = require('morgan')
 const cors = require('cors')
 const cloudinary = require('cloudinary').v2
 cloudinary.config({
-  cloud_name: process.env.CLOUD_NAME, 
-  api_key: process.env.CLOUD_API_KEY, 
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.CLOUD_API_KEY,
   api_secret: process.env.CLOUD_API_SECRET,
   secure: true
 })
@@ -22,6 +22,7 @@ const authRouter = require('./routes/authRoutes')
 const userRouter = require('./routes/userRoutes')
 const categoryRouter = require('./routes/categoryRoutes')
 const productRouter = require('./routes/productRoutes')
+const cartRouter = require('./routes/cartRoutes')
 
 // Admin Router
 const errorHandlerMiddleware = require('./middleware/error-handler')
@@ -38,6 +39,7 @@ app.use('/api/v1/auth', authRouter)
 app.use('/api/v1/user', userRouter)
 app.use('/api/v1/category', categoryRouter)
 app.use('/api/v1/product', productRouter)
+app.use('/api/v1/cart', cartRouter)
 
 app.use(NotFoundMiddleware)
 app.use(errorHandlerMiddleware)
