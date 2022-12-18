@@ -13,7 +13,9 @@ const CartSchema = new mongoose.Schema({
   },
   quantity: {
     type: Number,
-    default: 1
+    default: 1,
+    min: [1, 'quantity is beneath the limit 1'],
+    max: [100, 'quantity exceeds the limit of 100']
   }
 })
 
