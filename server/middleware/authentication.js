@@ -10,7 +10,8 @@ const authenticationMiddleware = (req, res, next) => {
   const token = authHeader.split(' ')[1]
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET)
-    req.user = createTokenUser(decoded)
+    const { name, _id, role } = decoded
+    req.user = { name, _id, role }
     next()
   } catch (error) {
     throw new UnauthenticatedError('Authentication failed.')

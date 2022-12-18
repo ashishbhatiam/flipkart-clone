@@ -5,8 +5,12 @@ const {
   toggleCartItem,
   updateCartQuantity
 } = require('../controllers/cartController')
+const { authenticationMiddleware } = require('../middleware/authentication')
 
-router.route('/').get(getCartItems)
-router.route('/:id').post(toggleCartItem).patch(updateCartQuantity)
+router.route('/').get(authenticationMiddleware, getCartItems)
+router
+  .route('/:id')
+  .post(authenticationMiddleware, toggleCartItem)
+  .patch(authenticationMiddleware, updateCartQuantity)
 
 module.exports = router
