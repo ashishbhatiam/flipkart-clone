@@ -5,6 +5,8 @@ const { user_role, admin_role } = require('./constants')
 const checkPermission = require('./checkPermission')
 const createSlugify = require('./createSlugify')
 const { formatBytes } = require('./helpers')
+const { storage, checkImageFileType, uploadImage } = require('./multer')
+const { uploadFileCloudinary } = require('./uploadFileCloudinary')
 
 module.exports = {
   createJWTtoken,
@@ -15,5 +17,9 @@ module.exports = {
   admin_role,
   checkPermission,
   createSlugify,
-  formatBytes
+  formatBytes,
+  storage,
+  checkImageFileType,
+  uploadImage,
+  uploadFileCloudinary
 }

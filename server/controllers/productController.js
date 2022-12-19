@@ -1,12 +1,9 @@
 const { BadRequestError } = require('../errors')
 const Product = require('../models/Product')
 const Category = require('../models/Category')
-const { formatBytes } = require('../utils')
-const path = require('path')
-const fs = require('fs')
+const { formatBytes, uploadFileCloudinary } = require('../utils')
 const { StatusCodes } = require('http-status-codes')
 const { default: slugify } = require('slugify')
-const cloudinary = require('cloudinary').v2
 
 const createProduct = async (req, res) => {
   const { _id: userId } = req.user
@@ -36,18 +33,7 @@ const createProduct = async (req, res) => {
   const productImages = []
   // Upload Images to Cloud
   for (const file of productFiles) {
-    const imagePath = path.join(__dirname, '../tmp/uploads', file.originalname)
-
-    // Upload API call
-    const result = await cloudinary.uploader.upload(imagePath, {
-      use_filename: true,
-      folder:
-        process.env.NODE_ENV === 'production'
-          ? 'flipkart-clone-api-live'
-          : 'flipkart-clone-api-dev'
-    })
-
-    fs.unlinkSync(imagePath)
+    const result = await uploadFileCloudinary(file)
 
     productImages.push({
       img: result.url,

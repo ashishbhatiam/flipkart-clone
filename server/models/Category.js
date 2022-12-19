@@ -12,6 +12,9 @@ const CategorySchema = new mongoose.Schema(
       required: true,
       unique: true
     },
+    img: {
+      type: String
+    },
     parent: {
       type: mongoose.Types.ObjectId,
       ref: 'Category'

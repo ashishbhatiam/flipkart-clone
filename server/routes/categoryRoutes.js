@@ -12,7 +12,7 @@ const {
   authenticationMiddleware,
   authorizePermissonsMiddleware
 } = require('../middleware/authentication')
-const { admin_role } = require('../utils')
+const { admin_role, uploadImage } = require('../utils')
 
 router
   .route('/')
@@ -20,6 +20,7 @@ router
   .post(
     authenticationMiddleware,
     authorizePermissonsMiddleware(admin_role),
+    uploadImage.single('img'),
     createCategory
   )
 

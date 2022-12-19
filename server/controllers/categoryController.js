@@ -1,10 +1,18 @@
 const Category = require('../models/Category')
 const { StatusCodes } = require('http-status-codes')
-const { createSlugify } = require('../utils')
+const { createSlugify, formatBytes, uploadFileCloudinary } = require('../utils')
 const { BadRequestError } = require('../errors')
 
 const createCategory = async (req, res) => {
   const { name, parent: parentId } = req.body
+  const categoryFile = req.file
+  // File Size Validation
+  const maxSize = 1024 * 2048
+  if (categoryFile.size > maxSize) {
+    throw new BadRequestError(
+      `Please Upload Category image smaller than ${formatBytes(maxSize)} only.`
+    )
+  }
   let payload = {
     name,
     slug: createSlugify(name)
@@ -16,6 +24,10 @@ const createCategory = async (req, res) => {
     }
     payload['parent'] = parentId
   }
+
+  const result = await uploadFileCloudinary(categoryFile)
+  payload['img'] = result.url
+
   const category = await Category.create(payload)
   res.status(StatusCodes.CREATED).json(category)
 }
