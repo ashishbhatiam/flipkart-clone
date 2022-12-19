@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const { BadRequestError } = require('../errors')
 
 const CartSchema = new mongoose.Schema({
   user: {
@@ -17,6 +18,16 @@ const CartSchema = new mongoose.Schema({
     min: [1, 'quantity is beneath the limit 1'],
     max: [100, 'quantity exceeds the limit of 100']
   }
+})
+
+CartSchema.pre('save', async function (next) {
+  const product = await this.model('Product').findOne({ _id: this.product })
+  if (product.inventory < this.quantity) {
+    throw new BadRequestError(
+      'Quantity exceeds the limit of available inventory.'
+    )
+  }
+  next()
 })
 
 module.exports = mongoose.model('Cart', CartSchema)
