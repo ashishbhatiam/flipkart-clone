@@ -1,4 +1,4 @@
-const { BadRequestError } = require('../errors')
+const { BadRequestError, NotFoundError } = require('../errors')
 const Product = require('../models/Product')
 const Category = require('../models/Category')
 const { formatBytes, uploadFileCloudinary } = require('../utils')
@@ -58,12 +58,116 @@ const createProduct = async (req, res) => {
 }
 
 const getAllProduct = async (req, res) => {
-  const products = await Product.find({}).sort('createdAt').populate('category')
-  res.status(StatusCodes.OK).json({ count: products.length, product: products })
+  const products = await Product.aggregate([
+    {
+      $facet: {
+        array: [
+          {
+            $match: {}
+          },
+          {
+            $sort: {
+              createdAt: -1
+            }
+          },
+          {
+            $group: {
+              _id: null,
+              count: { $sum: 1 },
+              products: {
+                $push: {
+                  _id: '$_id',
+                  name: '$name',
+                  slug: '$slug',
+                  price: '$price',
+                  description: '$description',
+                  category: '$category',
+                  createdBy: '$createdBy',
+                  productImages: '$productImages',
+                  inventory: '$inventory',
+                  freeShipping: '$freeShipping',
+                  featured: '$featured',
+                  averageRating: 'averageRating',
+                  numOfReviews: '$numOfReviews',
+                  createdAt: '$createdAt',
+                  updatedAt: '$updatedAt'
+                }
+              }
+            }
+          },
+          {
+            $project: {
+              _id: 0,
+              count: '$count',
+              products: '$products',
+              under5k: {
+                $filter: {
+                  input: '$products',
+                  as: 'item',
+                  cond: { $lte: ['$$item.price', 5000] }
+                }
+              },
+              under10k: {
+                $filter: {
+                  input: '$products',
+                  as: 'item',
+                  cond: { $lte: ['$$item.price', 10000] }
+                }
+              },
+              under20k: {
+                $filter: {
+                  input: '$products',
+                  as: 'item',
+                  cond: { $lte: ['$$item.price', 20000] }
+                }
+              },
+              under30k: {
+                $filter: {
+                  input: '$products',
+                  as: 'item',
+                  cond: { $lte: ['$$item.price', 30000] }
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      $project: {
+        count: {
+          $ifNull: [{ $arrayElemAt: ['$array.count', 0] }, 0]
+        },
+        products: {
+          $ifNull: [{ $arrayElemAt: ['$array.products', 0] }, []]
+        },
+        under5k: {
+          $ifNull: [{ $arrayElemAt: ['$array.under5k', 0] }, []]
+        },
+        under10k: {
+          $ifNull: [{ $arrayElemAt: ['$array.under10k', 0] }, []]
+        },
+        under20k: {
+          $ifNull: [{ $arrayElemAt: ['$array.under20k', 0] }, []]
+        },
+        under30k: {
+          $ifNull: [{ $arrayElemAt: ['$array.under30k', 0] }, []]
+        }
+      }
+    }
+  ])
+  res.status(StatusCodes.OK).json(products)
 }
 
 const getSingleProduct = async (req, res) => {
-  res.send('Get Single Product')
+  const { id: productId } = req.params
+  const product = await Product.findOne({ _id: productId }).select(
+    '-inventory -createdBy'
+  )
+  if (!product) {
+    throw new NotFoundError(`No product found with id: ${productId}.`)
+  }
+  res.status(StatusCodes.OK).json(product)
 }
 
 const updateProduct = async (req, res) => {
