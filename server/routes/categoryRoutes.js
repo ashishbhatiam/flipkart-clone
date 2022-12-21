@@ -30,6 +30,7 @@ router
   .patch(
     authenticationMiddleware,
     authorizePermissonsMiddleware(admin_role),
+    uploadImage.single('img'),
     updateCategory
   )
   .delete(
