@@ -23,6 +23,7 @@ const userRouter = require('./routes/userRoutes')
 const categoryRouter = require('./routes/categoryRoutes')
 const productRouter = require('./routes/productRoutes')
 const cartRouter = require('./routes/cartRoutes')
+const bannerRouter = require('./routes/bannerRoutes')
 
 // Admin Router
 const errorHandlerMiddleware = require('./middleware/error-handler')
@@ -40,6 +41,7 @@ app.use('/api/v1/user', userRouter)
 app.use('/api/v1/category', categoryRouter)
 app.use('/api/v1/product', productRouter)
 app.use('/api/v1/cart', cartRouter)
+app.use('/api/v1/banner', bannerRouter)
 
 app.use(NotFoundMiddleware)
 app.use(errorHandlerMiddleware)
