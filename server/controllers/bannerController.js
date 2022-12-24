@@ -1,7 +1,10 @@
 const Banner = require('../models/Banner')
 const Product = require('../models/Product')
 const { StatusCodes } = require('http-status-codes')
-const { getHostUrl, uploadFileCloudinary } = require('../utils')
+const {
+  getHostUrl,
+  uploadFileCloudinary
+} = require('../utils')
 const { BadRequestError } = require('../errors')
 
 const createBanner = async (req, res) => {
@@ -95,7 +98,13 @@ const createBanner = async (req, res) => {
   await banner.save()
   res.status(StatusCodes.CREATED).json(banner)
 }
-const getBanners = async (req, res) => {
+
+const getAllBanners = async (req, res) => {
+  const banners = await Banner.find({})
+  res.status(StatusCodes.OK).json(banners)
+}
+
+const getFeaturedBanners = async (req, res) => {
   const banners = await Banner.find({ featured: true })
   res.status(StatusCodes.OK).json(banners)
 }
@@ -114,8 +123,9 @@ const deleteBanner = async (req, res) => {
 
 module.exports = {
   createBanner,
-  getBanners,
+  getFeaturedBanners,
   updateBanner,
   deleteBanner,
-  getSingleBanner
+  getSingleBanner,
+  getAllBanners
 }

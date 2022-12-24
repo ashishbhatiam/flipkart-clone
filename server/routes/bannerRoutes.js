@@ -2,10 +2,11 @@ const express = require('express')
 const router = express.Router()
 const {
   createBanner,
-  getBanners,
+  getFeaturedBanners,
   updateBanner,
   deleteBanner,
-  getSingleBanner
+  getSingleBanner,
+  getAllBanners
 } = require('../controllers/bannerController')
 const {
   authenticationMiddleware,
@@ -15,12 +16,19 @@ const { admin_role, uploadImage } = require('../utils')
 
 router
   .route('/')
-  .get(getBanners)
+  .get(getFeaturedBanners)
   .post(
     authenticationMiddleware,
     authorizePermissonsMiddleware(admin_role),
     uploadImage.fields([{ name: 'banner' }, { name: 'products' }]),
     createBanner
+  )
+router
+  .route('/all')
+  .get(
+    authenticationMiddleware,
+    authorizePermissonsMiddleware(admin_role),
+    getAllBanners
   )
 router
   .route('/:id')
