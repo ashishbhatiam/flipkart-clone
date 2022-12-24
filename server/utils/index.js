@@ -4,7 +4,7 @@ const createUserData = require('./createUserData')
 const { user_role, admin_role } = require('./constants')
 const checkPermission = require('./checkPermission')
 const createSlugify = require('./createSlugify')
-const { formatBytes } = require('./helpers')
+const { formatBytes, getHostUrl } = require('./helpers')
 const { storage, checkImageFileType, uploadImage } = require('./multer')
 const { uploadFileCloudinary } = require('./uploadFileCloudinary')
 
@@ -21,5 +21,6 @@ module.exports = {
   storage,
   checkImageFileType,
   uploadImage,
-  uploadFileCloudinary
+  uploadFileCloudinary,
+  getHostUrl
 }

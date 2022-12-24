@@ -7,6 +7,11 @@ function formatBytes (a, b = 2) {
   }`
 }
 
+function getHostUrl (request) {
+  return `${request.protocol}://${request.get('host')}`
+}
+
 module.exports = {
-  formatBytes
+  formatBytes,
+  getHostUrl
 }

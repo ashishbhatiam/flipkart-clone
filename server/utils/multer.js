@@ -22,7 +22,7 @@ const checkImageFileType = function (file, cb) {
   }
 }
 
-const uploadImage = multer({
+const uploadImage = new multer({
   storage: storage,
   fileFilter: (req, file, cb) => {
     checkImageFileType(file, cb)

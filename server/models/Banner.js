@@ -1,11 +1,15 @@
 const mongoose = require('mongoose')
+const { getHostUrl } = require('../utils')
 
 const ProductsSchema = new mongoose.Schema({
   img: {
     type: String
   },
-  link: {
+  name: {
     type: String
+  },
+  size: {
+    type: Number
   }
 })
 
@@ -27,13 +31,7 @@ const BannerSchema = new mongoose.Schema(
       type: Boolean,
       default: false
     },
-    category: {
-      type: mongoose.Types.ObjectId,
-      ref: 'Category',
-      required: true,
-      unique: true
-    },
-    banners: {
+    banner: {
       img: {
         type: String,
         required: [true, 'please provide Banner image']
@@ -43,6 +41,18 @@ const BannerSchema = new mongoose.Schema(
       }
     },
     products: [ProductsSchema],
+    type: {
+      type: String,
+      enum: {
+        values: ['product', 'page'],
+        message: '{VALUE} is not supported type'
+      },
+      default: 'product'
+    },
+    product: {
+      type: mongoose.Types.ObjectId,
+      ref: 'Product'
+    },
     createdBy: {
       type: mongoose.Types.ObjectId,
       ref: 'User',
@@ -51,5 +61,14 @@ const BannerSchema = new mongoose.Schema(
   },
   { timestamps: true }
 )
+
+BannerSchema.pre('save', function (next) {
+  if (this.type === 'page') {
+    this.banner.link = `${this.banner.link}?banner=${this._id}?type=${this.type}`
+  } else {
+    this.banner.link = `${this.banner.link}?banner=${this._id}?type=${this.type}?product=${this.product}`
+  }
+  next()
+})
 
 module.exports = mongoose.model('Banner', BannerSchema)
