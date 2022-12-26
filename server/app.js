@@ -25,6 +25,7 @@ const productRouter = require('./routes/productRoutes')
 const cartRouter = require('./routes/cartRoutes')
 const bannerRouter = require('./routes/bannerRoutes')
 const addressRouter = require('./routes/addressRoutes')
+const orderRouter = require('./routes/orderRoutes')
 
 // Admin Router
 const errorHandlerMiddleware = require('./middleware/error-handler')
@@ -44,6 +45,7 @@ app.use('/api/v1/product', productRouter)
 app.use('/api/v1/cart', cartRouter)
 app.use('/api/v1/banner', bannerRouter)
 app.use('/api/v1/address', addressRouter)
+app.use('/api/v1/order', orderRouter)
 
 app.use(NotFoundMiddleware)
 app.use(errorHandlerMiddleware)
