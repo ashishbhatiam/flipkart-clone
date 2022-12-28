@@ -16,57 +16,60 @@ const ItemsSchema = new mongoose.Schema({
   }
 })
 
-const OrderStatusSchema = new mongoose.Schema({
-  status: {
-    type: String,
-    enum: {
-      values: ['ordered', 'packed', 'cancelled', 'shipped', 'delivered']
+const OrderSchema = new mongoose.Schema(
+  {
+    user: {
+      type: mongoose.Types.ObjectId,
+      ref: 'User',
+      requried: true
     },
-    default: 'ordered'
+    address: {
+      type: mongoose.Types.ObjectId,
+      ref: 'Address',
+      requried: true
+    },
+    total: {
+      type: Number,
+      requried: true
+    },
+    items: [ItemsSchema],
+    paymentStatus: {
+      type: String,
+      enum: {
+        values: ['pending', 'completed', 'cancelled', 'refund'],
+        message: '{VALUE} is not supported payment status'
+      },
+      default: 'pending'
+    },
+    paymentType: {
+      type: String,
+      enum: {
+        values: ['cod', 'card'],
+        message: '{VALUE} is not supported payment type'
+      },
+      default: 'cod'
+    }
   },
-  date: {
-    type: String,
-    required: true
-  },
-  completed: {
-    type: Boolean,
-    default: false
+  {
+    timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true }
   }
+)
+
+// // Virtuals
+OrderSchema.virtual('orderStatus', {
+  ref: 'Orderstatus',
+  localField: '_id',
+  foreignField: 'order',
+  justOne: false
 })
 
-const OrderSchema = new mongoose.Schema({
-  user: {
-    type: mongoose.Types.ObjectId,
-    ref: 'User',
-    requried: true
-  },
-  address: {
-    type: mongoose.Types.ObjectId,
-    ref: 'Address',
-    requried: true
-  },
-  total: {
-    type: Number,
-    requried: true
-  },
-  items: [ItemsSchema],
-  paymentStatus: {
-    type: String,
-    enum: {
-      values: ['pending', 'completed', 'cancelled', 'refund'],
-      message: '{VALUE} is not supported payment status'
-    },
-    default: 'pending'
-  },
-  paymentType: {
-    type: String,
-    enum: {
-      values: ['cod', 'card'],
-      message: '{VALUE} is not supported payment type'
-    },
-    default: 'cod'
-  },
-  orderStatus: [OrderStatusSchema]
+OrderSchema.pre('save', async function (next) {
+  if (this._id) {
+    await this.model('Orderstatus').create({ order: this._id })
+  }
+  next()
 })
 
 module.exports = mongoose.model('Order', OrderSchema)

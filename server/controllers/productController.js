@@ -156,7 +156,7 @@ const getAllProduct = async (req, res) => {
       }
     }
   ])
-  res.status(StatusCodes.OK).json(products)
+  res.status(StatusCodes.OK).json(products[0])
 }
 
 const getSingleProduct = async (req, res) => {

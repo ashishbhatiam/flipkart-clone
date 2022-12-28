@@ -21,6 +21,9 @@ const getCartItemsQuery = async userId => {
       }
     },
     {
+      $unwind: '$product'
+    },
+    {
       $project: {
         user: 1,
         quantity: 1,
