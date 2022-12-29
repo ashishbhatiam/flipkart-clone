@@ -68,6 +68,7 @@ OrderSchema.virtual('orderStatus', {
 OrderSchema.pre('save', async function (next) {
   if (this._id) {
     await this.model('Orderstatus').create({ order: this._id })
+    await this.model('Cart').deleteMany({ user: this.user })
   }
   next()
 })
