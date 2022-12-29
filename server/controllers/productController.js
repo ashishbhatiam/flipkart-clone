@@ -90,7 +90,9 @@ const getAllProduct = async (req, res) => {
                   averageRating: 'averageRating',
                   numOfReviews: '$numOfReviews',
                   createdAt: '$createdAt',
-                  updatedAt: '$updatedAt'
+                  updatedAt: '$updatedAt',
+                  averageRating: '$averageRating',
+                  numOfReviews: '$numOfReviews'
                 }
               }
             }
