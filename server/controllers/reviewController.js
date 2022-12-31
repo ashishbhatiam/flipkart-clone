@@ -2,6 +2,7 @@ const Review = require('../models/Review')
 const Product = require('../models/Product')
 const { BadRequestError, NotFoundError } = require('../errors')
 const { StatusCodes } = require('http-status-codes')
+const { checkPermission } = require('../utils')
 
 const createReview = async (req, res) => {
   const { product: productId, rating, title, comment } = req.body
@@ -57,12 +58,36 @@ const getSingleReview = async (req, res) => {
 }
 
 const deleteReview = async (req, res) => {
-  res.send('Delete Review')
+  const { id: reviewId } = req.params
+  const review = await Review.findOne({ _id: reviewId })
+  if (!review) {
+    throw new NotFoundError(`No review find with id: ${reviewId}`)
+  }
+  checkPermission(req.user, review.user)
+  await review.remove()
+  res.status(StatusCodes.OK).end()
+}
+
+const updateReview = async (req, res) => {
+  const { id: reviewId } = req.params
+  const { _id, product, createdAt, updatedAt, user, ...restReviewObj } =
+    req.body
+  let review = await Review.findOne({ _id: reviewId })
+  if (!review) {
+    throw new NotFoundError(`No review find with id: ${reviewId}`)
+  }
+  checkPermission(req.user, review.user)
+
+  review = Object.assign(review, restReviewObj)
+  const updatedReview = await review.save()
+
+  res.status(StatusCodes.OK).json(updatedReview)
 }
 
 module.exports = {
   createReview,
   getAllProductReviews,
   getSingleReview,
-  deleteReview
+  deleteReview,
+  updateReview
 }

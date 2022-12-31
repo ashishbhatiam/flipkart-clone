@@ -4,7 +4,8 @@ const {
   createReview,
   getAllProductReviews,
   getSingleReview,
-  deleteReview
+  deleteReview,
+  updateReview
 } = require('../controllers/reviewController')
 const { authenticationMiddleware } = require('../middleware/authentication')
 
@@ -17,5 +18,6 @@ router
   .route('/:id')
   .get(getSingleReview)
   .delete(authenticationMiddleware, deleteReview)
+  .patch(authenticationMiddleware, updateReview)
 
 module.exports = router
