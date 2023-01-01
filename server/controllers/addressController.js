@@ -2,6 +2,7 @@ const Address = require('../models/Address')
 const { StatusCodes } = require('http-status-codes')
 const { checkAdminPermissionBoolean, checkPermission } = require('../utils')
 const { NotFoundError } = require('../errors')
+const _ = require('lodash')
 
 const getAllAddress = async (req, res) => {
   let queryConditions = {}
@@ -34,14 +35,22 @@ const createAddress = async (req, res) => {
 
 const updateAddress = async (req, res) => {
   const { id: addressID } = req.params
-  const { _id, country, createdBy, createdAt, updatedAt, ...restAddressObj } =
-    req.body
+  const bodyObj = _.pick(req.body, [
+    'name',
+    'mobileNumber',
+    'alternativeNumber',
+    'landmark',
+    'pincode',
+    'city',
+    'state',
+    'type'
+  ])
   let address = await Address.findOne({ _id: addressID })
   if (!address) {
     throw new NotFoundError(`No address found with id: ${addressID}.`)
   }
   checkPermission(req.user, address.createdBy)
-  address = Object.assign(address, restAddressObj)
+  address = Object.assign(address, bodyObj)
   const updatedAddress = await address.save()
   await res.status(StatusCodes.OK).json(updatedAddress)
 }

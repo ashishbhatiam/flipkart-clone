@@ -12,6 +12,7 @@ const {
   BadRequestError,
   UnauthenticatedError
 } = require('../errors')
+const _ = require('lodash')
 
 const getCurrentUser = async (req, res) => {
   const { _id } = req.user
@@ -37,8 +38,14 @@ const getSingleUser = async (req, res) => {
 
 const updateUser = async (req, res) => {
   const { id: userId } = req.params
-  const bodyObj = ({ userName, email, contactNumber, firstName, lastName } =
-    req.body)
+  const bodyObj = _.pick(req.body, [
+    'userName',
+    'email',
+    'contactNumber',
+    'firstName',
+    'lastName'
+  ])
+
   const profilePicture = req.file
   if (profilePicture) {
     const result = await uploadFileCloudinary(profilePicture)
