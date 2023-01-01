@@ -6,7 +6,9 @@ const createUserData = user => {
     userName: user.userName,
     email: user.email,
     _id: user._id,
-    role: user.role
+    role: user.role,
+    contactNumber: user.contactNumber,
+    profilePicture: user.profilePicture
   }
 }
 

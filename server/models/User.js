@@ -1,5 +1,7 @@
 const mongoose = require('mongoose')
 const bcrypt = require('bcryptjs')
+const validator = require('validator')
+const { BadRequestError } = require('../errors')
 
 const UserSchema = mongoose.Schema(
   {
@@ -30,7 +32,11 @@ const UserSchema = mongoose.Schema(
       required: [true, 'Please provide email'],
       trim: true,
       unique: true,
-      lowercase: true
+      lowercase: true,
+      validate: {
+        validator: validator.isEmail,
+        message: 'Please provide valid email'
+      }
     },
     password: {
       type: String,
@@ -56,8 +62,22 @@ const UserSchema = mongoose.Schema(
 
 UserSchema.pre('save', async function () {
   this.fullName = `${this.firstName} ${this.lastName}`
-  const salt = await bcrypt.genSalt(10)
-  this.password = await bcrypt.hash(this.password, salt)
+  if (this.isModified('password')) {
+    const salt = await bcrypt.genSalt(10)
+    this.password = await bcrypt.hash(this.password, salt)
+  }
+})
+
+UserSchema.post('save', async function (error, doc, next) {
+  if (error.code === 11000) {
+    next(
+      new BadRequestError(
+        `username with ${Object.values(error.keyValue)} already exists.`
+      )
+    )
+  } else {
+    next(error)
+  }
 })
 
 UserSchema.methods.comparePassword = async function (candidatePassword) {
