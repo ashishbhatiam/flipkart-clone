@@ -1,7 +1,7 @@
 const { BadRequestError, NotFoundError } = require('../errors')
 const Product = require('../models/Product')
 const Category = require('../models/Category')
-const { formatBytes, uploadFileCloudinary } = require('../utils')
+const { formatBytes, uploadFileCloudinary, _pickObj } = require('../utils')
 const { StatusCodes } = require('http-status-codes')
 const { default: slugify } = require('slugify')
 
@@ -173,11 +173,87 @@ const getSingleProduct = async (req, res) => {
 }
 
 const updateProduct = async (req, res) => {
-  res.send('Update Product')
+  const { id: productId } = req.params
+  const bodyObj = _pickObj(req.body, [
+    'name',
+    'price',
+    'description',
+    'category',
+    'inventory',
+    'featured'
+  ])
+  let product = await Product.findOne({ _id: productId })
+  if (!product) {
+    throw new NotFoundError(`No product found with id: ${productId}.`)
+  }
+  if (bodyObj.category) {
+    const category = await Category.findOne({ _id: bodyObj.category })
+    if (!category) {
+      throw new NotFoundError(`No category found with id: ${bodyObj.category}.`)
+    }
+  }
+  if (bodyObj.name) {
+    bodyObj['slug'] = slugify(bodyObj.name)
+  }
+  const productFiles = req.files
+  if (productFiles && Array.isArray(productFiles)) {
+    // File Size Validation
+    const maxSize = 1024 * 2048
+    if (productFiles.some(file => file.size > maxSize)) {
+      throw new BadRequestError(
+        `Please Upload Product images smaller than ${formatBytes(
+          maxSize
+        )} only.`
+      )
+    }
+    if (productFiles.length > 10) {
+      throw new BadRequestError('maximun 10 product images are allowed.')
+    }
+  }
+  if (productFiles && Array.isArray(productFiles) && productFiles.length) {
+    // Upload Images to Cloud
+    for (const file of productFiles) {
+      const result = await uploadFileCloudinary(file)
+
+      product['productImages'].push({
+        img: result.url,
+        name: result.original_filename,
+        size: result.bytes
+      })
+    }
+  }
+  product = Object.assign(product, bodyObj)
+
+  const updatedProduct = await product.save()
+  res.status(StatusCodes.OK).json(updatedProduct)
 }
 
 const deleteProduct = async (req, res) => {
-  res.send('Delete Product')
+  const { id: productId } = req.params
+  let product = await Product.findOne({ _id: productId })
+  if (!product) {
+    throw new NotFoundError(`No product found with id: ${productId}.`)
+  }
+  await product.remove()
+  res.status(StatusCodes.OK).end()
+}
+
+const deleteProductImage = async (req, res) => {
+  const { id: productId } = req.params
+  const { imageName } = req.body
+  let product = await Product.findOne({ _id: productId })
+  if (!product) {
+    throw new NotFoundError(`No product found with id: ${productId}.`)
+  }
+  if (!imageName) {
+    throw new BadRequestError('Please provide image name.')
+  }
+  const updatedProduct = await Product.findOneAndUpdate(
+    { _id: productId },
+    { $pull: { productImages: { name: imageName } } },
+    { new: true }
+  )
+  res.status(StatusCodes.OK).json(updatedProduct)
 }
 
 module.exports = {
@@ -185,5 +261,6 @@ module.exports = {
   getAllProduct,
   getSingleProduct,
   updateProduct,
-  deleteProduct
+  deleteProduct,
+  deleteProductImage
 }

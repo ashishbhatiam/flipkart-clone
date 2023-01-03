@@ -304,7 +304,6 @@ const updateCategory = async (req, res) => {
 const deleteCategory = async (req, res) => {
   const { id: categoryId } = req.params
   const category = await Category.findOneAndDelete({ _id: categoryId })
-  console.log('category: ', category);
   if (!category) {
     throw new NotFoundError(`No category found with id: ${categoryId}.`)
   }

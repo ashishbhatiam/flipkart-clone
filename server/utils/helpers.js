@@ -1,3 +1,5 @@
+const _ = require('lodash')
+
 function formatBytes (a, b = 2) {
   if (!+a) return '0 Bytes'
   const c = 0 > b ? 0 : b,
@@ -11,7 +13,12 @@ function getHostUrl (request) {
   return `${request.protocol}://${request.get('host')}`
 }
 
+const _pickObj = (obj, keys) => {
+  return _.pick(obj, keys)
+}
+
 module.exports = {
   formatBytes,
-  getHostUrl
+  getHostUrl,
+  _pickObj
 }

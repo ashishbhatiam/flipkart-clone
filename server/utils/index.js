@@ -7,7 +7,7 @@ const {
   checkAdminPermissionBoolean
 } = require('./checkPermission')
 const createSlugify = require('./createSlugify')
-const { formatBytes, getHostUrl } = require('./helpers')
+const { formatBytes, getHostUrl, _pickObj } = require('./helpers')
 const { storage, checkImageFileType, uploadImage } = require('./multer')
 const { uploadFileCloudinary } = require('./uploadFileCloudinary')
 
@@ -26,5 +26,6 @@ module.exports = {
   checkImageFileType,
   uploadImage,
   uploadFileCloudinary,
-  getHostUrl
+  getHostUrl,
+  _pickObj
 }

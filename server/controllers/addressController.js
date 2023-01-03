@@ -1,8 +1,7 @@
 const Address = require('../models/Address')
 const { StatusCodes } = require('http-status-codes')
-const { checkAdminPermissionBoolean, checkPermission } = require('../utils')
+const { checkAdminPermissionBoolean, checkPermission, _pickObj } = require('../utils')
 const { NotFoundError } = require('../errors')
-const _ = require('lodash')
 
 const getAllAddress = async (req, res) => {
   let queryConditions = {}
@@ -35,7 +34,7 @@ const createAddress = async (req, res) => {
 
 const updateAddress = async (req, res) => {
   const { id: addressID } = req.params
-  const bodyObj = _.pick(req.body, [
+  const bodyObj = _pickObj(req.body, [
     'name',
     'mobileNumber',
     'alternativeNumber',

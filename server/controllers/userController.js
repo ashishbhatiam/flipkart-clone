@@ -5,14 +5,14 @@ const {
   createTokenUser,
   createUserData,
   checkPermission,
-  uploadFileCloudinary
+  uploadFileCloudinary,
+  _pickObj
 } = require('../utils')
 const {
   NotFoundError,
   BadRequestError,
   UnauthenticatedError
 } = require('../errors')
-const _ = require('lodash')
 
 const getCurrentUser = async (req, res) => {
   const { _id } = req.user
@@ -38,7 +38,7 @@ const getSingleUser = async (req, res) => {
 
 const updateUser = async (req, res) => {
   const { id: userId } = req.params
-  const bodyObj = _.pick(req.body, [
+  const bodyObj = _pickObj(req.body, [
     'userName',
     'email',
     'contactNumber',

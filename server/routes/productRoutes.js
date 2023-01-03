@@ -6,7 +6,8 @@ const {
   getAllProduct,
   getSingleProduct,
   updateProduct,
-  deleteProduct
+  deleteProduct,
+  deleteProductImage
 } = require('../controllers/productController')
 
 const {
@@ -31,12 +32,21 @@ router
   .patch(
     authenticationMiddleware,
     authorizePermissonsMiddleware(admin_role),
+    uploadImage.array('images'),
     updateProduct
   )
   .delete(
     authenticationMiddleware,
     authorizePermissonsMiddleware(admin_role),
     deleteProduct
+  )
+
+router
+  .route('/:id/remove-productimage')
+  .delete(
+    authenticationMiddleware,
+    authorizePermissonsMiddleware(admin_role),
+    deleteProductImage
   )
 
 module.exports = router
