@@ -1,6 +1,10 @@
 const Address = require('../models/Address')
 const { StatusCodes } = require('http-status-codes')
-const { checkAdminPermissionBoolean, checkPermission, _pickObj } = require('../utils')
+const {
+  checkAdminPermissionBoolean,
+  checkPermission,
+  _pickObj
+} = require('../utils')
 const { NotFoundError } = require('../errors')
 
 const getAllAddress = async (req, res) => {
@@ -55,7 +59,14 @@ const updateAddress = async (req, res) => {
 }
 
 const deleteAddress = async (req, res) => {
-  res.send('Delete Address')
+  const { id: addressID } = req.params
+  const address = await Address.findOne({ _id: addressID })
+  if (!address) {
+    throw new NotFoundError(`No address found with id: ${addressID}.`)
+  }
+  checkPermission(req.user, address.createdBy)
+  await address.remove()
+  res.status(StatusCodes.OK).end()
 }
 
 module.exports = {

@@ -1,11 +1,8 @@
 const Banner = require('../models/Banner')
 const Product = require('../models/Product')
 const { StatusCodes } = require('http-status-codes')
-const {
-  getHostUrl,
-  uploadFileCloudinary
-} = require('../utils')
-const { BadRequestError } = require('../errors')
+const { getHostUrl, uploadFileCloudinary, _pickObj } = require('../utils')
+const { BadRequestError, NotFoundError } = require('../errors')
 
 const createBanner = async (req, res) => {
   const { _id: userID } = req.user
@@ -110,15 +107,38 @@ const getFeaturedBanners = async (req, res) => {
 }
 
 const getSingleBanner = async (req, res) => {
-  res.send('Get Single Banner')
+  const { id: bannerId } = req.params
+  const banner = await Banner.findOne({ _id: bannerId }).populate({
+    path: 'product',
+    select: '-inventory -createdBy'
+  })
+  if (!banner) {
+    throw new NotFoundError(`No banner found with id: ${bannerId}`)
+  }
+  res.status(StatusCodes.OK).json(banner)
 }
 
 const updateBanner = async (req, res) => {
-  res.send('Update Banner')
+  const { id: bannerId } = req.params
+  const bodyObj = _pickObj(req.body, ['title', 'description', 'featured'])
+  let banner = await Banner.findOne({ _id: bannerId })
+  if (!banner) {
+    throw new NotFoundError(`No banner found with id: ${bannerId}`)
+  }
+
+  banner = Object.assign(banner, bodyObj)
+
+  const updatedBanner = await banner.save()
+  res.status(StatusCodes.OK).json(updatedBanner)
 }
 
 const deleteBanner = async (req, res) => {
-  res.send('Delete Banner')
+  const { id: bannerId } = req.params
+  const banner = await Banner.findOneAndDelete({ _id: bannerId })
+  if (!banner) {
+    throw new NotFoundError(`No banner found with id: ${bannerId}`)
+  }
+  res.status(StatusCodes.OK).end()
 }
 
 module.exports = {
